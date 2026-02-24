@@ -103,7 +103,7 @@ public class UserController {
                 .body(result);
     }
 
-    @PutMapping("/edit/{userId}")
+    @PutMapping("/edit/update/{userId}")
     public ResponseEntity<UserResponse> update(@PathVariable Long userId, @Valid @RequestBody UserPutRequest updated){
         log.info("HTTP PUT /api/v1/users/{} firstName{}, lastName{}, email{}, age{}, hireDate{}, phoneNumber{}, password{}",
                 userId, updated.firstName(),updated.lastName(),updated.email(),updated.age(),updated.hireDate(),updated.phoneNumber(),updated.password());
