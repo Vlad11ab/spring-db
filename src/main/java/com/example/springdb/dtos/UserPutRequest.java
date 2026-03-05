@@ -15,7 +15,7 @@ public record UserPutRequest(
         @NotBlank
         String email,
         @NotNull
-        int age,
+        Integer age,
         @NotNull
         LocalDate hireDate,
         @NotBlank

@@ -1,7 +1,7 @@
 package com.example.springdb.dtos;
 
 public record UserPatchRequest(
-        int age,
+        Integer age,
         String email,
         String password
 

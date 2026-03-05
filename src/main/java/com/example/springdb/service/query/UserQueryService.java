@@ -1,10 +1,8 @@
 package com.example.springdb.service.query;
 
 import com.example.springdb.dtos.UserResponse;
-import com.example.springdb.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -5,6 +5,8 @@ import com.example.springdb.dtos.UserPatchRequest;
 import com.example.springdb.dtos.UserPutRequest;
 import com.example.springdb.dtos.UserResponse;
 import com.example.springdb.exceptions.EmailAlreadyExistsException;
+import com.example.springdb.exceptions.EmptyPatchRequest;
+import com.example.springdb.exceptions.PhoneNumberAlreadyExistsException;
 import com.example.springdb.exceptions.UserNotFoundException;
 import com.example.springdb.mappers.UserMapper;
 import com.example.springdb.model.User;
@@ -30,7 +32,10 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public UserResponse create(UserCreateRequest request) {
         if(userRepository.existsByEmailJPQL(request.email())){
-            throw new EmailAlreadyExistsException(request.email());
+            throw new EmailAlreadyExistsException();
+        }
+        if(userRepository.existsByPhoneNumber(request.phoneNumber())){
+            throw new PhoneNumberAlreadyExistsException();
         }
         User savedUser = userRepository.save(userMapper.toEntity(request));
         return userMapper.toDto(savedUser);
@@ -40,8 +45,11 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public UserResponse patch(Long userId, UserPatchRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new UserNotFoundException());
 
+        if(request.password() == null && request.age() == null && request.email() == null){
+            throw new EmptyPatchRequest();
+        }
         if(request.password() != null && !request.password().isBlank()){
             user.setPassword(request.password());
         }
@@ -58,12 +66,12 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Override
     public UserResponse update(Long userId, UserPutRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new UserNotFoundException(userId));
+                .orElseThrow(()-> new UserNotFoundException());
 
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setEmail(request.email());
-        user.setAge(45);
+        user.setAge(request.age());
         user.setHireDate(LocalDate.now());
         user.setPhoneNumber(request.phoneNumber());
         user.setPassword(request.password());
@@ -76,7 +84,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public void delete(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new UserNotFoundException());
 
         userRepository.delete(user);
     }

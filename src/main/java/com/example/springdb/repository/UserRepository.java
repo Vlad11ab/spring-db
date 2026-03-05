@@ -68,5 +68,8 @@ public interface UserRepository extends JpaRepository<User,Long> , JpaSpecificat
 
     @Query("select (count(u) > 0) from User u where lower(u.email) = :email")
     boolean existsByEmailJPQL(@Param("email") String email);
+
+    @Query("select (count(u) > 0) from User u where lower(u.phoneNumber) = :phoneNumber")
+    boolean existsByPhoneNumber(@Param("phoneNumber") String phoneNumber);
 }
 

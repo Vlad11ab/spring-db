@@ -8,7 +8,7 @@ public record UserResponse(
         String firstName,
         String lastName,
         String email,
-        int age,
+        Integer age,
         LocalDate hireDate,
         String phoneNumber,
         String password

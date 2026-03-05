@@ -19,7 +19,7 @@ public record UserCreateRequest(
 
         @NotNull(message = "Varsta obligatorie")
         @Positive(message = "Varsta trebuie sa fie >0")
-        int age,
+        Integer age,
 
         @NotNull
         @PastOrPresent(message = "Data angajarii nu poate fi in viitor")

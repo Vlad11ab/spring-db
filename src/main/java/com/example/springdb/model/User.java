@@ -30,21 +30,25 @@ public class User {
     @Size(min = 3, max = 50, message = "Numele de familie trebuie sa fie cuprins intre 3-50")
     private String lastName;
 
-    @Column
+    @Column(name = "email")
     @Email
     @NotBlank(message = "Email obligatoriu")
     private String email;
 
+    @Column(name = "age")
     @Positive(message = "Varsta > 16 ani")
-    private int age;
+    private Integer age;
 
+    @Column(name = "hire_date")
     @NotNull(message = "Data angajarii obligatorie")
     private LocalDate hireDate;
 
+    @Column(name = "password")
     @Size(min = 5, max = 20, message = "Parola trebuie sa contina intre 5-20 de caractere")
     @NotBlank
     private String password;
 
+    @Column(name = "phone_number")
     @NotBlank(message = "Numar de telefon obligatoriu")
     private String phoneNumber;
 }

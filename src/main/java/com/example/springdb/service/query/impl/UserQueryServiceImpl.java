@@ -2,7 +2,6 @@ package com.example.springdb.service.query.impl;
 
 import com.example.springdb.dtos.UserResponse;
 import com.example.springdb.mappers.UserMapper;
-import com.example.springdb.model.User;
 import com.example.springdb.repository.UserRepository;
 import com.example.springdb.service.query.UserQueryService;
 import org.springframework.data.domain.Page;
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
-import static java.sql.Types.NULL;
 
 @Component
 public class UserQueryServiceImpl implements UserQueryService {
