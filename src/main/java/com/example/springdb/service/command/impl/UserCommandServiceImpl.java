@@ -4,10 +4,7 @@ import com.example.springdb.dtos.UserCreateRequest;
 import com.example.springdb.dtos.UserPatchRequest;
 import com.example.springdb.dtos.UserPutRequest;
 import com.example.springdb.dtos.UserResponse;
-import com.example.springdb.exceptions.EmailAlreadyExistsException;
-import com.example.springdb.exceptions.EmptyPatchRequest;
-import com.example.springdb.exceptions.PhoneNumberAlreadyExistsException;
-import com.example.springdb.exceptions.UserNotFoundException;
+import com.example.springdb.exceptions.*;
 import com.example.springdb.mappers.UserMapper;
 import com.example.springdb.model.User;
 import com.example.springdb.repository.UserRepository;
@@ -47,6 +44,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException());
 
+
         if(request.password() == null && request.age() == null && request.email() == null){
             throw new EmptyPatchRequest();
         }
@@ -68,6 +66,16 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new UserNotFoundException());
 
+        if(request.firstName() == null && request.firstName().isBlank() &&
+                request.lastName() == null && request.lastName().isBlank() &&
+                request.email() == null && request.email().isBlank() &&
+                request.age() == null &&
+                request.hireDate() == null &&
+                request.phoneNumber() == null &&
+                request.password() == null && request.password().isBlank()
+        ) {
+            throw new EmptyUpdateRequestException();
+        }
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setEmail(request.email());
@@ -82,10 +90,12 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     @Transactional
-    public void delete(Long id) {
+    public UserResponse delete(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException());
 
+        User deleted = user;
         userRepository.delete(user);
+        return userMapper.toDto(deleted);
     }
 }

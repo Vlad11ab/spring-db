@@ -9,5 +9,5 @@ public interface UserCommandService {
     UserResponse create(UserCreateRequest request);
     UserResponse patch(Long userId, UserPatchRequest request);
     UserResponse update(Long userId, UserPutRequest request);
-    void delete(Long id);
+    UserResponse delete(Long id);
 }
