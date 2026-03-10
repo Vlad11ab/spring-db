@@ -1,7 +1,7 @@
 package com.example.springdb.system.exceptions;
 
 import com.example.springdb.exceptions.EmailAlreadyExistsException;
-import com.example.springdb.exceptions.EmptyPatchRequest;
+import com.example.springdb.exceptions.EmptyPatchRequestException;
 import com.example.springdb.exceptions.PhoneNumberAlreadyExistsException;
 import com.example.springdb.exceptions.UserNotFoundException;
 import jakarta.validation.ConstraintViolationException;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            EmptyPatchRequest.class
+            EmptyPatchRequestException.class
     })
     public ResponseEntity<Map<String,Object>> handleBadRequest(RuntimeException exception){
         Map<String,Object> body = new HashMap<>();

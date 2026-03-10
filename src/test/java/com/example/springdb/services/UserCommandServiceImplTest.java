@@ -2,11 +2,9 @@ package com.example.springdb.services;
 
 import com.example.springdb.dtos.UserCreateRequest;
 import com.example.springdb.dtos.UserPatchRequest;
+import com.example.springdb.dtos.UserPutRequest;
 import com.example.springdb.dtos.UserResponse;
-import com.example.springdb.exceptions.EmailAlreadyExistsException;
-import com.example.springdb.exceptions.EmptyPatchRequest;
-import com.example.springdb.exceptions.PhoneNumberAlreadyExistsException;
-import com.example.springdb.exceptions.UserNotFoundException;
+import com.example.springdb.exceptions.*;
 import com.example.springdb.mappers.UserMapper;
 import com.example.springdb.model.User;
 import com.example.springdb.repository.UserRepository;
@@ -17,13 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-
 import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -84,7 +80,7 @@ public class UserCommandServiceImplTest {
         );
 
         User toSave = userMapper.toEntity(request);
-        User savedUser=userMapper.toEntity(request);
+        User savedUser = userMapper.toEntity(request);
         savedUser.setId(1L);
         when(userRepository.existsByEmailJPQL(request.email())).thenReturn(false);
         when(userRepository.existsByPhoneNumber(request.phoneNumber())).thenReturn(false);
@@ -95,10 +91,22 @@ public class UserCommandServiceImplTest {
     }
 
     @Test
-    void createThrowsWhenNotFoundException(){
+    void deleteThrowsWhenMissing(){
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class,()->userCommandServiceImpl.delete(1L));
     }
+
+    @Test
+    void deleteRemovesWhenExisting(){
+        User existing = new User();
+        existing.setId(30L);
+
+        when(userRepository.findById(30L)).thenReturn(Optional.of(existing));
+        userCommandServiceImpl.delete(30L);
+        verify(userRepository).delete(existing);
+    }
+
+
 
     @Test
     void patchThrowsWhenNotFoundException(){
@@ -107,7 +115,7 @@ public class UserCommandServiceImplTest {
     }
 
     @Test
-    void patchThrowsEmptyPatchRequest(){
+    void patchThrowsWhenEmptyPayload(){
         User existing = new User();
         existing.setId(1L);
 
@@ -115,7 +123,7 @@ public class UserCommandServiceImplTest {
 
         UserPatchRequest emptyRequest = new UserPatchRequest(null,null,null);
 
-        assertThrows(EmptyPatchRequest.class,()->userCommandServiceImpl.patch(1L, emptyRequest));
+        assertThrows(EmptyPatchRequestException.class,()->userCommandServiceImpl.patch(1L, emptyRequest));
     }
 
     @Test
@@ -151,11 +159,64 @@ public class UserCommandServiceImplTest {
         UserPatchRequest patch = new UserPatchRequest(60,"email@email.text","parola");
         UserResponse response = userCommandServiceImpl.patch(1L, patch);
 
-        assertEquals(existing.getAge(), response.age());
-        assertEquals(existing.getEmail(), response.email());
-        assertEquals(existing.getPassword(),response.password());
-        verify(userRepository).save(existing);
+        assertEquals(60, response.age());
+        assertEquals("email@email.text", response.email());
+        assertEquals("parola",response.password());
     }
+
+    @Test
+    void updateThrowsWhenNotFound(){
+        UserPutRequest update = new UserPutRequest(
+                "Rares",
+                "Zorila",
+                "zorila@yahoo.com",
+                20,
+                LocalDate.now(),
+                "0788473827",
+                "UnitedS"
+        );
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class,()->userCommandServiceImpl.update(1L, update));
+    }
+
+    @Test
+    void updateThrowsWhenEmptyPayload(){
+        User existing = new User();
+        existing.setId(1L);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
+
+        UserPutRequest emptyUpdate = new UserPutRequest("","","",null,null,"","");
+
+        assertThrows(EmptyUpdateRequestException.class,()-> userCommandServiceImpl.update(1L, emptyUpdate));
+    }
+
+    @Test
+    void updateReplacesFields(){
+        //preconditia
+        User existing = new User();
+        existing.setId(1L);
+        existing.setFirstName("Cristi");
+        existing.setLastName("Gogan");
+        existing.setEmail("cristi@yahoo.com");
+        existing.setAge(22);
+        existing.setHireDate(LocalDate.now());
+        existing.setPhoneNumber("0784876374");
+        existing.setPassword("Parola");
+        UserPutRequest request = new UserPutRequest("Vlad","Breazu","unEmail@yahoo.com",22,LocalDate.now(),"0722836743","AltaParola");
+        UserResponse expectedResult = new UserResponse(1L,"Vlad","Breazu","unEmail@yahoo.com",22,LocalDate.now(),"0722836743","AltaParola");
+        User toSave = new User(1L,"Vlad","Breazu","unEmail@yahoo.com",22,LocalDate.now(),"AltaParola","0722836743");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(userRepository.save(toSave)).thenReturn(toSave);
+
+        //actiunea
+        UserResponse result= userCommandServiceImpl.update(1L,request);
+
+        //verificare
+        assertEquals(expectedResult,result);
+    }
+
+
 
 
 }

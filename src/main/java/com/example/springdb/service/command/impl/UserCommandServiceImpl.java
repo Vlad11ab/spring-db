@@ -46,7 +46,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
 
         if(request.password() == null && request.age() == null && request.email() == null){
-            throw new EmptyPatchRequest();
+            throw new EmptyPatchRequestException();
         }
         if(request.password() != null && !request.password().isBlank()){
             user.setPassword(request.password());
@@ -66,13 +66,13 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new UserNotFoundException());
 
-        if(request.firstName() == null && request.firstName().isBlank() &&
-                request.lastName() == null && request.lastName().isBlank() &&
-                request.email() == null && request.email().isBlank() &&
+        if(request.firstName().isBlank() &&
+                request.lastName().isBlank() &&
+                request.email().isBlank() &&
                 request.age() == null &&
                 request.hireDate() == null &&
-                request.phoneNumber() == null &&
-                request.password() == null && request.password().isBlank()
+                request.phoneNumber().isBlank() &&
+                request.password().isBlank()
         ) {
             throw new EmptyUpdateRequestException();
         }
