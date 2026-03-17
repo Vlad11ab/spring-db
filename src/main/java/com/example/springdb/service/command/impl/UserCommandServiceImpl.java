@@ -18,11 +18,9 @@ import java.time.LocalDate;
 public class UserCommandServiceImpl implements UserCommandService {
 
     UserRepository userRepository;
-    UserMapper userMapper;
 
-    public UserCommandServiceImpl(UserRepository userRepository, UserMapper userMapper){
+    public UserCommandServiceImpl(UserRepository userRepository){
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
     }
 
     @Override
@@ -34,8 +32,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         if(userRepository.existsByPhoneNumber(request.phoneNumber())){
             throw new PhoneNumberAlreadyExistsException();
         }
-        User savedUser = userRepository.save(userMapper.toEntity(request));
-        return userMapper.toDto(savedUser);
+        User savedUser = userRepository.save(UserMapper.toEntity(request));
+        return UserMapper.toDto(savedUser);
     }
 
     @Override
@@ -58,7 +56,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             user.setEmail(request.email());
         }
         User patchedUser = userRepository.save(user);
-        return userMapper.toDto(patchedUser);
+        return UserMapper.toDto(patchedUser);
     }
 
     @Override
@@ -85,7 +83,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         user.setPassword(request.password());
 
         User updatedUser = userRepository.save(user);
-        return userMapper.toDto(updatedUser);
+        return UserMapper.toDto(updatedUser);
     }
 
     @Override
@@ -96,6 +94,6 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         User deleted = user;
         userRepository.delete(user);
-        return userMapper.toDto(deleted);
+        return UserMapper.toDto(deleted);
     }
 }

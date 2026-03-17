@@ -5,7 +5,6 @@ import com.example.springdb.dtos.UserPatchRequest;
 import com.example.springdb.dtos.UserPutRequest;
 import com.example.springdb.dtos.UserResponse;
 import com.example.springdb.exceptions.*;
-import com.example.springdb.mappers.UserMapper;
 import com.example.springdb.model.User;
 import com.example.springdb.repository.UserRepository;
 import com.example.springdb.service.command.impl.UserCommandServiceImpl;
@@ -28,13 +27,11 @@ public class UserCommandServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
-    private UserMapper userMapper;
     private UserCommandServiceImpl userCommandServiceImpl;
 
     @BeforeEach
     void setUp(){
-       userMapper = new UserMapper();
-       userCommandServiceImpl = new UserCommandServiceImpl(userRepository,userMapper);
+       userCommandServiceImpl = new UserCommandServiceImpl(userRepository);
     }
 
     @Test
@@ -78,16 +75,36 @@ public class UserCommandServiceImplTest {
                 "0788473827",
                 "UnitedS"
         );
+        UserResponse expectedResult = new UserResponse(
+                1L,
+                "Rares",
+                "Zorila",
+                "zorila@yahoo.com",
+                20,
+                LocalDate.now(),
+                "0788473827",
+                "UnitedS");
+        User userSaved = new User(1L,
+                "Rares",
+                "Zorila",
+                "zorila@yahoo.com",
+                20,LocalDate.now(),
+                "UnitedS",
+                "0788473827");
+        User userToSave = new User(
+                "Rares",
+                "Zorila",
+                "zorila@yahoo.com",
+                20,LocalDate.now(),
+                "UnitedS",
+                "0788473827");
 
-        User toSave = userMapper.toEntity(request);
-        User savedUser = userMapper.toEntity(request);
-        savedUser.setId(1L);
         when(userRepository.existsByEmailJPQL(request.email())).thenReturn(false);
         when(userRepository.existsByPhoneNumber(request.phoneNumber())).thenReturn(false);
-        when(userRepository.save(toSave)).thenReturn(savedUser);
+        when(userRepository.save(userToSave)).thenReturn(userSaved);
 
-        UserResponse userResponse = userCommandServiceImpl.create(request);
-        assertEquals(userResponse.id(),1L);
+        UserResponse actualResponse = userCommandServiceImpl.create(request);
+        assertEquals(expectedResult,actualResponse);
     }
 
     @Test

@@ -16,11 +16,10 @@ import java.util.Optional;
 public class UserQueryServiceImpl implements UserQueryService {
 
     UserRepository userRepository;
-    UserMapper userMapper;
 
-    public UserQueryServiceImpl(UserRepository userRepository, UserMapper userMapper){
+
+    public UserQueryServiceImpl(UserRepository userRepository){
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
 
     }
 
@@ -28,40 +27,40 @@ public class UserQueryServiceImpl implements UserQueryService {
     public List<UserResponse> findAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(userMapper::toDto)
+                .map(UserMapper::toDto)
                 .toList();
 //          .map(el->userMapper.toDto(el))
     }
 
     @Override
     public Optional<UserResponse> findByFirstName(String firstName) {
-        return userRepository.findByLastNameIgnoreCaseJPQL(firstName)
-                .map(userMapper::toDto);
+        return userRepository.findByFirstNameIgnoreCaseJPQL(firstName)
+                .map(UserMapper::toDto);
     }
 
     @Override
     public Optional<UserResponse> findByEmail(String email) {
         return userRepository.findUserByEmail(email)
-                .map(userMapper::toDto);
+                .map(UserMapper::toDto);
     }
 
     @Override
     public Optional<UserResponse> findByLastName(String lastName) {
         return userRepository.findByLastNameIgnoreCaseJPQL(lastName)
-                .map(userMapper::toDto);
+                .map(UserMapper::toDto);
     }
 
     @Override
     public Optional<UserResponse> findByEmailIgnoreCase(String email) {
         return userRepository.findByEmailIgnoreCaseJPQL(email)
-                .map(userMapper::toDto);
+                .map(UserMapper::toDto);
     }
 
     @Override
     public List<UserResponse> findByAgeRange(int minAge, int maxAge) {
         return userRepository.findByAgeRange(minAge,maxAge)
                 .stream()
-                .map(userMapper::toDto)
+                .map(UserMapper::toDto)
                 .toList();
     }
 
@@ -69,7 +68,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public List<UserResponse> findHiredBetween(LocalDate from, LocalDate to) {
         return userRepository.findHiredBetween(from,to)
                 .stream()
-                .map(userMapper::toDto)
+                .map(UserMapper::toDto)
                 .toList();
     }
 
@@ -80,10 +79,10 @@ public class UserQueryServiceImpl implements UserQueryService {
                 .filter(user -> firstName == null || firstName.equals(user.getFirstName()))
                 .filter(user -> lastName == null || lastName.equals(user.getLastName()))
                 .filter(user -> email == null || email.equals(user.getEmail()))
-                .filter(user -> age == null || age == user.getAge())
+                .filter(user -> age == null || age.equals(user.getAge()))
                 .filter(user -> hireDate == null || hireDate.equals(user.getHireDate()))
                 .filter(user -> password == null || password.equals(user.getPassword()))
-                .map(userMapper::toDto)
+                .map(UserMapper::toDto)
                 .toList();
 
         return list;
@@ -91,7 +90,7 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     public Page<UserResponse> searchByFirstNameOrEmailOrPhoneNumber(String query, Pageable pageable) {
         return userRepository.searchByFirstNameOrEmailOrPhoneNumber(query,pageable)
-                .map(userMapper::toDto);
+                .map(UserMapper::toDto);
     }
 
     @Override

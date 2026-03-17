@@ -3,12 +3,11 @@ package com.example.springdb.mappers;
 import com.example.springdb.dtos.UserCreateRequest;
 import com.example.springdb.dtos.UserResponse;
 import com.example.springdb.model.User;
-import org.springframework.stereotype.Component;
 
-@Component
+
 public class UserMapper {
 
-    public User toEntity(UserCreateRequest request){
+    public static User toEntity(UserCreateRequest request){
         if(request == null) return null;
 
         return User.builder()
@@ -22,7 +21,7 @@ public class UserMapper {
                 .build();
     }
 
-    public UserResponse toDto(User user){
+    public static UserResponse toDto(User user){
 
         return new UserResponse(
                 user.getId(),

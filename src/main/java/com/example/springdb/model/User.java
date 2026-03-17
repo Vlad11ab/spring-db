@@ -51,4 +51,14 @@ public class User {
     @Column(name = "phone_number")
     @NotBlank(message = "Numar de telefon obligatoriu")
     private String phoneNumber;
+
+    public User(String firstName, String lastName, String email, Integer age, LocalDate hireDate, String password, String phoneNumber) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.age = age;
+        this.hireDate = hireDate;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+    }
 }
