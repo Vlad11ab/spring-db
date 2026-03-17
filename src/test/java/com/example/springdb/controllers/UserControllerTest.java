@@ -1,23 +1,23 @@
 package com.example.springdb.controllers;
 
-
 import com.example.springdb.controller.UserController;
 import com.example.springdb.service.command.UserCommandService;
 import com.example.springdb.service.query.UserQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.boot.test.autoconfigure.*;
 
 
-@WebMvcTest(controller =)
+@WebMvcTest(UserController.class)
 public class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UserQueryService userQueryService;
 
-    @MockBean
+    @MockitoBean
     private UserCommandService userCommandService;
 }
