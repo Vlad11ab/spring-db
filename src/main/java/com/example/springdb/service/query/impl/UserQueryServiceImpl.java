@@ -1,10 +1,10 @@
 package com.example.springdb.service.query.impl;
 
 import com.example.springdb.dtos.UserResponse;
+import com.example.springdb.dtos.UserResponseList;
 import com.example.springdb.mappers.UserMapper;
 import com.example.springdb.repository.UserRepository;
 import com.example.springdb.service.query.UserQueryService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -57,11 +57,11 @@ public class UserQueryServiceImpl implements UserQueryService {
     }
 
     @Override
-    public List<UserResponse> findByAgeRange(int minAge, int maxAge) {
-        return userRepository.findByAgeRange(minAge,maxAge)
+    public UserResponseList findByAgeRange(int minAge, int maxAge) {
+        return new UserResponseList(userRepository.findByAgeRange(minAge,maxAge)
                 .stream()
                 .map(UserMapper::toDto)
-                .toList();
+                .toList());
     }
 
     @Override
@@ -73,7 +73,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     }
 
     @Override
-    public List<UserResponse> search(String firstName, String lastName, String email, Integer age, LocalDate hireDate, String password, String phoneNumber) {
+    public UserResponseList search(String firstName, String lastName, String email, Integer age, LocalDate hireDate, String password, String phoneNumber) {
 
         var list = userRepository.findAll().stream()
                 .filter(user -> firstName == null || firstName.equals(user.getFirstName()))
@@ -85,12 +85,13 @@ public class UserQueryServiceImpl implements UserQueryService {
                 .map(UserMapper::toDto)
                 .toList();
 
-        return list;
+        return new UserResponseList(list);
     }
 
-    public Page<UserResponse> searchByFirstNameOrEmailOrPhoneNumber(String query, Pageable pageable) {
-        return userRepository.searchByFirstNameOrEmailOrPhoneNumber(query,pageable)
-                .map(UserMapper::toDto);
+    public UserResponseList searchByFirstNameOrEmailOrPhoneNumber(String query, Pageable pageable) {
+        return new UserResponseList(userRepository.searchByFirstNameOrEmailOrPhoneNumber(query,pageable).stream()
+                .map(UserMapper::toDto)
+                .toList());
     }
 
     @Override

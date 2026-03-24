@@ -1,9 +1,6 @@
 package com.example.springdb.controller;
 
-import com.example.springdb.dtos.UserCreateRequest;
-import com.example.springdb.dtos.UserPatchRequest;
-import com.example.springdb.dtos.UserPutRequest;
-import com.example.springdb.dtos.UserResponse;
+import com.example.springdb.dtos.*;
 import com.example.springdb.service.command.UserCommandService;
 import com.example.springdb.service.query.UserQueryService;
 import jakarta.validation.Valid;
@@ -41,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/age/{minAge}-{maxAge}")
-    public ResponseEntity<List<UserResponse>> getUsersByAgeRange(@PathVariable int minAge, @PathVariable int maxAge){
+    public ResponseEntity<UserResponseList> getUsersByAgeRange(@PathVariable int minAge, @PathVariable int maxAge){
         log.info("HTTP GET /api/v1/users minAge={} maxAge{}",minAge ,maxAge );
         return ResponseEntity.status(HttpStatus.OK).body(userQueryService.findByAgeRange(minAge,maxAge));
     }
@@ -73,7 +70,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<UserResponse>> search(
+    public ResponseEntity<UserResponseList> search(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
@@ -89,7 +86,7 @@ public class UserController {
     }
 
     @GetMapping("/searchByFirstName")
-    public ResponseEntity<List<UserResponse>> searchByFirstName(
+    public ResponseEntity<UserResponseList> searchByFirstName(
             @RequestParam(required = false) String firstName
     ){
         log.info("HTTP GET - SEARCH BY FIRSTNAME METHOD");
@@ -97,7 +94,7 @@ public class UserController {
         String text = "";
         text = firstName;
 
-        List<UserResponse> result = userQueryService.searchByFirstNameOrEmailOrPhoneNumber(text, Pageable.unpaged()).getContent();
+        UserResponseList result = userQueryService.searchByFirstNameOrEmailOrPhoneNumber(text, Pageable.unpaged());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(result);

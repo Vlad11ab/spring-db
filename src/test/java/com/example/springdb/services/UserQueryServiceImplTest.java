@@ -1,6 +1,7 @@
 package com.example.springdb.services;
 
 import com.example.springdb.dtos.UserResponse;
+import com.example.springdb.dtos.UserResponseList;
 import com.example.springdb.model.User;
 import com.example.springdb.repository.UserRepository;
 import com.example.springdb.service.query.UserQueryService;
@@ -102,11 +103,11 @@ public class UserQueryServiceImplTest {
         UserResponse userResponse5 = new UserResponse(6L, "Radu", "Stan", "radu.stan@gmail.com", 29, LocalDate.now(), "0766234567", "raduPass");
 
         List<User> users = List.of(user1,user2,user3,user4,user5);
-        List<UserResponse> expected = List.of(userResponse3);
+        UserResponseList expected = new UserResponseList(List.of(userResponse3));
 
         when(userRepository.findByAgeRange(30,40)).thenReturn(List.of(user3));
 
-        List<UserResponse> actual = userQueryService.findByAgeRange(30,40);
+        UserResponseList actual = userQueryService.findByAgeRange(30,40);
         assertEquals(expected, actual);
     }
 
@@ -124,21 +125,21 @@ public class UserQueryServiceImplTest {
 
     @Test
     void search(){
-//        User user1 = User.builder().id(2L).firstName("Andrei").lastName("Popescu").email("andrei.popescu@gmail.com").age(25).hireDate(LocalDate.now()).password("parola123").phoneNumber("0721123456").build();
-//        User user2 = User.builder().id(3L).firstName("Maria").lastName("Ionescu").email("maria.ionescu@gmail.com").age(28).hireDate(LocalDate.now()).password("securePass").phoneNumber("0732456789").build();
-//        User user3 = User.builder().id(4L).firstName("Alex").lastName("Georgescu").email("alex.georgescu@gmail.com").age(31).hireDate(LocalDate.now()).password("alexPass").phoneNumber("0743987654").build();
-//        User user4 = User.builder().id(5L).firstName("Elena").lastName("Dumitrescu").email("elena.dumitrescu@gmail.com").age(24).hireDate(LocalDate.now()).password("elenaPwd").phoneNumber("0755123987").build();
-//        User user5 = User.builder().id(6L).firstName("Radu").lastName("Stan").email("radu.stan@gmail.com").age(29).hireDate(LocalDate.now()).password("raduPass").phoneNumber("0766234567").build();
-//        UserResponse userResponse1 = new UserResponse(2L, "Andrei", "Popescu", "andrei.popescu@gmail.com", 25, LocalDate.now(), "0721123456", "parola123");
-//        UserResponse userResponse2 = new UserResponse(3L, "Maria", "Ionescu", "maria.ionescu@gmail.com", 28, LocalDate.now(), "0732456789", "securePass");
-//        UserResponse userResponse3 = new UserResponse(4L, "Alex", "Georgescu", "alex.georgescu@gmail.com", 31, LocalDate.now(), "0743987654", "alexPass");
-//        UserResponse userResponse4 = new UserResponse(5L, "Elena", "Dumitrescu", "elena.dumitrescu@gmail.com", 24, LocalDate.now(), "0755123987", "elenaPwd");
-//        UserResponse userResponse5 = new UserResponse(6L, "Radu", "Stan", "radu.stan@gmail.com", 29, LocalDate.now(), "0766234567", "raduPass");
-//
-//        List<User> users = List.of(user1,user2,user3,user4,user5);
-//        List<UserResponse> expected = List.of(userResponse2);
-//
-//        when(userRepository.findAll().stream().filter(user -> user.getFirstName()
+        User user1 = User.builder().id(2L).firstName("Andrei").lastName("Popescu").email("andrei.popescu@gmail.com").age(25).hireDate(LocalDate.now()).password("parola123").phoneNumber("0721123456").build();
+        User user2 = User.builder().id(3L).firstName("Maria").lastName("Ionescu").email("maria.ionescu@gmail.com").age(28).hireDate(LocalDate.now()).password("securePass").phoneNumber("0732456789").build();
+        User user3 = User.builder().id(4L).firstName("Alex").lastName("Georgescu").email("alex.georgescu@gmail.com").age(31).hireDate(LocalDate.now()).password("alexPass").phoneNumber("0743987654").build();
+        User user4 = User.builder().id(5L).firstName("Elena").lastName("Dumitrescu").email("elena.dumitrescu@gmail.com").age(24).hireDate(LocalDate.now()).password("elenaPwd").phoneNumber("0755123987").build();
+        User user5 = User.builder().id(6L).firstName("Radu").lastName("Stan").email("radu.stan@gmail.com").age(29).hireDate(LocalDate.now()).password("raduPass").phoneNumber("0766234567").build();
+        UserResponse userResponse1 = new UserResponse(2L, "Andrei", "Popescu", "andrei.popescu@gmail.com", 25, LocalDate.now(), "0721123456", "parola123");
+        UserResponse userResponse2 = new UserResponse(3L, "Maria", "Ionescu", "maria.ionescu@gmail.com", 28, LocalDate.now(), "0732456789", "securePass");
+        UserResponse userResponse3 = new UserResponse(4L, "Alex", "Georgescu", "alex.georgescu@gmail.com", 31, LocalDate.now(), "0743987654", "alexPass");
+        UserResponse userResponse4 = new UserResponse(5L, "Elena", "Dumitrescu", "elena.dumitrescu@gmail.com", 24, LocalDate.now(), "0755123987", "elenaPwd");
+        UserResponse userResponse5 = new UserResponse(6L, "Radu", "Stan", "radu.stan@gmail.com", 29, LocalDate.now(), "0766234567", "raduPass");
+
+        List<User> users = List.of(user1,user2,user3,user4,user5);
+        List<UserResponse> expected = List.of(userResponse2);
+
+
     }
 
     @Test
@@ -162,19 +163,18 @@ public class UserQueryServiceImplTest {
 //
 //        assertEquals(expected,actual);
         List<User> users = List.of(user1, user2, user3, user4, user5);
+        UserResponseList userResponseList = new UserResponseList(List.of(userResponse1,userResponse2,userResponse3,userResponse4,userResponse5));
+
         Pageable pageable = Pageable.unpaged();
 
         when(userRepository.searchByFirstNameOrEmailOrPhoneNumber("a", pageable))
                 .thenReturn(new PageImpl<>(users));
 
-        Page<UserResponse> actual =
+        UserResponseList actual =
                 userQueryService.searchByFirstNameOrEmailOrPhoneNumber("a", pageable);
 
-        assertEquals(5, actual.getTotalElements());
-        assertEquals(
-                List.of(userResponse1, userResponse2, userResponse3, userResponse4, userResponse5),
-                actual.getContent()
-        );
+
+        assertEquals(userResponseList, actual);
 
 
     }
