@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -32,18 +33,21 @@ public class UserController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<List<UserResponse>>getAllUsers(){
         log.info("HTTP Method GET All Users");
         return ResponseEntity.status(HttpStatus.OK).body(userQueryService.findAllUsers());
     }
 
     @GetMapping("/age/{minAge}-{maxAge}")
+    @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<UserResponseList> getUsersByAgeRange(@PathVariable int minAge, @PathVariable int maxAge){
         log.info("HTTP GET /api/v1/users minAge={} maxAge{}",minAge ,maxAge );
         return ResponseEntity.status(HttpStatus.OK).body(userQueryService.findByAgeRange(minAge,maxAge));
     }
 
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<Optional<UserResponse>> getUserByEmail(@PathVariable String email){
         log.info("HTTP METHOD GET BY EMAIL");
         log.debug("HTTP GET /api/v1/users/{}", email);
@@ -51,25 +55,29 @@ public class UserController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserCreateRequest user){
         log.info("HTTP POST /api/v1/users firstName={} lastName={} email ={} age={}", user.firstName(), user.lastName(),user.email(), user.age());
         return ResponseEntity.status(HttpStatus.CREATED).body(userCommandService.create(user));
     }
 
     @PatchMapping("/edit/{userId}")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<UserResponse> patchUser(@PathVariable Long userId, @Valid @RequestBody UserPatchRequest patched){
         log.info("HTTP PATCH /api/v1/users/{}", userId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userCommandService.patch(userId,patched));
     }
 
     @DeleteMapping("/delete/{userId}")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId){
-        log.info("HTTP DELETE /api/v1/{}", userId);
+        log.info("HTTP DELETE /api/v1/users/delete/{}", userId);
         userCommandService.delete(userId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<UserResponseList> search(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -86,6 +94,7 @@ public class UserController {
     }
 
     @GetMapping("/searchByFirstName")
+    @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<UserResponseList> searchByFirstName(
             @RequestParam(required = false) String firstName
     ){
@@ -101,6 +110,7 @@ public class UserController {
     }
 
     @PutMapping("/edit/update/{userId}")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<UserResponse> update(@PathVariable Long userId, @Valid @RequestBody UserPutRequest updated){
         log.info("HTTP PUT /api/v1/users/{} firstName{}, lastName{}, email{}, age{}, hireDate{}, phoneNumber{}, password{}",
                 userId, updated.firstName(),updated.lastName(),updated.email(),updated.age(),updated.hireDate(),updated.phoneNumber(),updated.password());
