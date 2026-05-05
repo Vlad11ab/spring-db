@@ -6,15 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -32,18 +27,10 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfiguration {
-    private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
     private final String secretKey;
 
-    public SecurityConfiguration(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder,
-            @Value("${application.jwt.secretKey}") String secretKey
-            ){
-        this.userDetailsService=userDetailsService;
-        this.passwordEncoder=passwordEncoder;
-        this.secretKey=secretKey;
+    public SecurityConfiguration(@Value("${application.jwt.secretKey}") String secretKey) {
+        this.secretKey = secretKey;
     }
 
     @Bean
@@ -56,17 +43,9 @@ public class SecurityConfiguration {
                         .requestMatchers(SecurityConstants.PUBLIC_URLS).permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated())
-                .authenticationProvider(authenticationProvider()) //add .exceptionHandling
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         return http.build();
 
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
     }
 
     @Bean

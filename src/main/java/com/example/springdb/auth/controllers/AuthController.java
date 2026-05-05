@@ -1,9 +1,10 @@
 package com.example.springdb.auth.controllers;
 
+import com.example.springdb.auth.dtos.AuthLoginRequest;
+import com.example.springdb.auth.dtos.AuthResponse;
 import com.example.springdb.auth.service.AuthService;
 import com.example.springdb.dtos.UserCreateRequest;
 import com.example.springdb.dtos.UserCreateResponse;
-import com.example.springdb.service.command.UserCommandService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -21,18 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserCommandService userCommandService;
 
-    public AuthController(AuthService authService, UserCommandService userCommandService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.userCommandService = userCommandService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody UserCreateRequest request){
+    public ResponseEntity<UserCreateResponse> register(@Valid @RequestBody UserCreateRequest request){
         log.info("HTTP POST /api/v1/auth/register");
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    }
 
-        UserCreateResponse userCreateResponse=authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body("");
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthLoginRequest request) {
+        log.info("HTTP POST /api/v1/auth/login");
+        return ResponseEntity.status(HttpStatus.OK).body(authService.login(request));
     }
 }

@@ -10,10 +10,10 @@ import com.example.springdb.dtos.UserCreateResponse;
 import com.example.springdb.exceptions.EmailAlreadyExistsException;
 import com.example.springdb.model.UserApp;
 import com.example.springdb.repository.UserRepository;
-import com.example.springdb.service.command.UserCommandService;
-import com.example.springdb.service.query.UserQueryService;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,21 +22,15 @@ import java.util.Set;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private UserCommandService userCommandService;
-    private UserQueryService userQueryService;
-    private AuthenticationManager authenticationManager;
-    private JWTTokenProvider jwtTokenProvider;
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JWTTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(UserCommandService userCommandService,
-                           UserQueryService userQueryService,
-                           AuthenticationManager authenticationManager,
+    public AuthServiceImpl(AuthenticationManager authenticationManager,
                            JWTTokenProvider jwtTokenProvider,
                            UserRepository userRepository,
                            PasswordEncoder passwordEncoder) {
-        this.userCommandService = userCommandService;
-        this.userQueryService = userQueryService;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
@@ -61,31 +55,37 @@ public class AuthServiceImpl implements AuthService {
         userApp.setPermissions(Set.of(UserPermissions.USER_READ,UserPermissions.USER_WRITE));
 
         UserApp savedUserApp = userRepository.save(userApp);
-
-
-        return  null;
-
-
-
+        return new UserCreateResponse(
+                savedUserApp.getId(),
+                savedUserApp.getFirstName(),
+                savedUserApp.getLastName(),
+                savedUserApp.getEmail(),
+                savedUserApp.getAge(),
+                savedUserApp.getHireDate(),
+                savedUserApp.getPhoneNumber(),
+                jwtTokenProvider.generateToken(savedUserApp)
+        );
     }
 
     @Override
     public AuthResponse login(AuthLoginRequest request) {
-//        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(),request.password()));
-//
-//        User user = userQueryService.findByEmail(request.email())
-//                .orElseThrow(() -> new UsernameNotFoundException(request.email()));
-//
-//        return new AuthResponse(
-//                user.getId(),
-//                user.getFirstName(),
-//                user.getLastName(),
-//                user.getEmail(),
-//                user.getPassword(),
-//                user.getHireDate(),
-//                user.getPhoneNumber(),
-//                jwtTokenProvider.generateToken(user)
-//        );
-        return null;
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+        );
+
+        UserApp user = userRepository.findByEmailIgnoreCaseJPQL(request.email())
+                .orElseThrow(() -> new UsernameNotFoundException(request.email()));
+
+        return new AuthResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getAge(),
+                user.getHireDate(),
+                user.getPhoneNumber(),
+                user.getPermissions(),
+                jwtTokenProvider.generateToken(user)
+        );
     }
 }

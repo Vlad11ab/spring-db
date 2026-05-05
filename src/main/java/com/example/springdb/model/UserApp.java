@@ -50,8 +50,7 @@ public class UserApp implements UserDetails {
     @NotNull(message = "Data angajarii obligatorie")
     private LocalDate hireDate;
 
-    @Column(name = "password")
-    @Size(min = 5, max = 20, message = "Parola trebuie sa contina intre 5-20 de caractere")
+    @Column(name = "password", length = 255)
     @NotBlank
     private String password;
 
