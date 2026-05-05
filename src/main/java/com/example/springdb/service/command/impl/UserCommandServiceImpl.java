@@ -6,7 +6,7 @@ import com.example.springdb.dtos.UserPutRequest;
 import com.example.springdb.dtos.UserResponse;
 import com.example.springdb.exceptions.*;
 import com.example.springdb.mappers.UserMapper;
-import com.example.springdb.model.User;
+import com.example.springdb.model.UserApp;
 import com.example.springdb.repository.UserRepository;
 import com.example.springdb.service.command.UserCommandService;
 import org.springframework.stereotype.Component;
@@ -32,14 +32,14 @@ public class UserCommandServiceImpl implements UserCommandService {
         if(userRepository.existsByPhoneNumber(request.phoneNumber())){
             throw new PhoneNumberAlreadyExistsException();
         }
-        User savedUser = userRepository.save(UserMapper.toEntity(request));
-        return UserMapper.toDto(savedUser);
+        UserApp savedUserApp = userRepository.save(UserMapper.toEntity(request));
+        return UserMapper.toDto(savedUserApp);
     }
 
     @Override
     @Transactional
     public UserResponse patch(Long userId, UserPatchRequest request) {
-        User user = userRepository.findById(userId)
+        UserApp userApp = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException());
 
 
@@ -47,21 +47,22 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new EmptyPatchRequestException();
         }
         if(request.password() != null && !request.password().isBlank()){
-            user.setPassword(request.password());
+            userApp.setPassword(request.password());
         }
         if(request.age()>0){
-            user.setAge(request.age());
+            userApp.setAge(request.age());
         }
         if(request.email() != null && !request.email().isBlank() && request.email().length()>5){
-            user.setEmail(request.email());
+            userApp.setEmail(request.email());
         }
-        User patchedUser = userRepository.save(user);
-        return UserMapper.toDto(patchedUser);
+
+        UserApp patchedUserApp = userRepository.save(userApp);
+        return UserMapper.toDto(patchedUserApp);
     }
 
     @Override
     public UserResponse update(Long userId, UserPutRequest request) {
-        User user = userRepository.findById(userId)
+        UserApp userApp = userRepository.findById(userId)
                 .orElseThrow(()-> new UserNotFoundException());
 
         if(request.firstName().isBlank() &&
@@ -74,26 +75,26 @@ public class UserCommandServiceImpl implements UserCommandService {
         ) {
             throw new EmptyUpdateRequestException();
         }
-        user.setFirstName(request.firstName());
-        user.setLastName(request.lastName());
-        user.setEmail(request.email());
-        user.setAge(request.age());
-        user.setHireDate(LocalDate.now());
-        user.setPhoneNumber(request.phoneNumber());
-        user.setPassword(request.password());
+        userApp.setFirstName(request.firstName());
+        userApp.setLastName(request.lastName());
+        userApp.setEmail(request.email());
+        userApp.setAge(request.age());
+        userApp.setHireDate(LocalDate.now());
+        userApp.setPhoneNumber(request.phoneNumber());
+        userApp.setPassword(request.password());
 
-        User updatedUser = userRepository.save(user);
-        return UserMapper.toDto(updatedUser);
+        UserApp updatedUserApp = userRepository.save(userApp);
+        return UserMapper.toDto(updatedUserApp);
     }
 
     @Override
     @Transactional
     public UserResponse delete(Long id) {
-        User user = userRepository.findById(id)
+        UserApp userApp = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException());
 
-        User deleted = user;
-        userRepository.delete(user);
+        UserApp deleted = userApp;
+        userRepository.delete(userApp);
         return UserMapper.toDto(deleted);
     }
 }

@@ -22,3 +22,10 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+
+application:
+  jwt:
+    tokenPrefix: "Bearer"
+    tokenExpirationAfterDays: 7
+    secretKey: ${JWT_SECRET_KEY:asdasdasdasdasd123344asdasdasdasdasasd12321332sadasXYZ0123456789ABCDEF}
+

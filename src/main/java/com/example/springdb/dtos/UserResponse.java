@@ -1,7 +1,9 @@
 package com.example.springdb.dtos;
 
-import java.time.LocalDate;
+import com.example.springdb.config.security.UserPermissions;
 
+import java.time.LocalDate;
+import java.util.Set;
 
 public record UserResponse(
         Long id,
@@ -11,6 +13,5 @@ public record UserResponse(
         Integer age,
         LocalDate hireDate,
         String phoneNumber,
-        String password
-)
-{}
+        Set<UserPermissions> userPermissions, String password
+){}
